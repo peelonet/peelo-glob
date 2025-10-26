@@ -2,9 +2,9 @@
 
 ![Build](https://github.com/peelonet/peelo-glob/workflows/Build/badge.svg)
 
-[C++17] header only wrapper to [glob()] function.
-
-Does not work on Windows.
+Cross platform [C++17] header only library to do [globbing]. On *nix systems,
+it uses the [glob()] function and on Windows it uses the [PathMatchSpec()]
+function.
 
 ## Example
 
@@ -34,4 +34,6 @@ main(int argc, char** argv)
 ```
 
 [C++17]: https://en.cppreference.com/w/cpp/17
+[globbing]: https://en.wikipedia.org/wiki/Glob_(programming)
 [glob()]: https://pubs.opengroup.org/onlinepubs/009695399/basedefs/glob.h.html
+[PathMatchSpec()]: https://docs.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathmatchspecw

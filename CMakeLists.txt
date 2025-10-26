@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.12)
 
 PROJECT(
   PeeloGlob
-  VERSION 1.0.0
+  VERSION 2.0.0
   DESCRIPTION "C++17 wrapper for glob() function"
   HOMEPAGE_URL "https://github.com/peelonet/peelo-glob"
   LANGUAGES CXX

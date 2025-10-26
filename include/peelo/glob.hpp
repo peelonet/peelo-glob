@@ -30,7 +30,12 @@
 #include <filesystem>
 #include <vector>
 
-#include <glob.h>
+#if defined(_WIN32)
+#  include <fileapi.h>
+#  include <shlwapi.h>
+#else
+#  include <glob.h>
+#endif
 
 namespace peelo
 {
@@ -38,6 +43,28 @@ namespace peelo
   bool
   glob(const std::string& pattern, std::vector<T>& output)
   {
+#if defined(_WIN32)
+    std::wstring wpattern(std::begin(pattern), std::end(pattern));
+    LPWIN32_FIND_DATAW find_data;
+    auto handle = FindFirstFileW(L".", find_data);
+
+    if (handle == INVALID_HANDLE_VALUE)
+    {
+      return false;
+    }
+    if (PathMatchSpecW(find_data->cFileName, wpattern.c_str()))
+    {
+      output.emplace_back(wpattern);
+    }
+    while (FindNextFileW(handle, find_data) != 0)
+    {
+      if (PathMatchSpecW(find_data->cFileName, wpattern.c_str()))
+      {
+        output.emplace_back(wpattern);
+      }
+    }
+    FindClose(handle);
+#else
     ::glob_t result;
     int return_value;
 
@@ -63,6 +90,7 @@ namespace peelo
       output.emplace_back(result.gl_pathv[i]);
     }
     ::globfree(&result);
+#endif
 
     return true;
   }
