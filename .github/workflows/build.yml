@@ -7,14 +7,16 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
         name: Checkout
-      - name: Build & Test
-        uses: ashutoshvarma/action-cmake-build@master
+      - name: Build
+        uses: threeal/cmake-action@v2.1.0
         with:
-          build-dir: ${{ runner.workspace }}/build
-          build-type: Release
-          configure-options: -DCMAKE_CXX_FLAGS="-std=c++17"
-          run-test: true
+          build-args: --config Release
+      - name: Test
+        uses: threeal/ctest-action@v1.1.0
+        with:
+          build-config: Release
+          verbose: true
