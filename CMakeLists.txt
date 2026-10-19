@@ -2,7 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.12)
 
 PROJECT(
   PeeloGlob
-  VERSION 1.0.0
+  VERSION 2.0.0
   DESCRIPTION "C++17 wrapper for glob() function"
   HOMEPAGE_URL "https://github.com/peelonet/peelo-glob"
   LANGUAGES CXX
@@ -65,12 +65,14 @@ INSTALL(
     ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake
 )
 
-INSTALL(
-  DIRECTORY
-    ${PROJECT_SOURCE_DIR}/include/peelo
-  DESTINATION
-    include
-)
+IF(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+  INSTALL(
+    DIRECTORY
+      ${PROJECT_SOURCE_DIR}/include/peelo
+    DESTINATION
+      include
+  )
 
-ENABLE_TESTING()
-ADD_SUBDIRECTORY(test)
+  ENABLE_TESTING()
+  ADD_SUBDIRECTORY(test)
+ENDIF()

@@ -17,6 +17,14 @@ FOREACH(TEST_FILENAME ${TEST_SOURCES})
       cxx_std_17
   )
 
+  IF(MINGW)
+    TARGET_COMPILE_OPTIONS(
+      ${TEST_NAME}
+      PRIVATE
+        -static -static-libgcc -static-libstdc++
+    )
+  ENDIF()
+
   TARGET_LINK_LIBRARIES(
     ${TEST_NAME}
     PeeloGlob

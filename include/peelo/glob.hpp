@@ -27,10 +27,21 @@
 #pragma once
 
 #include <cstring>
+#include <cwchar>
 #include <filesystem>
 #include <vector>
 
-#include <glob.h>
+#if defined(_WIN32)
+#  ifndef NOMINMAX
+#    define NOMINMAX
+#  endif
+#  ifndef WIN32_LEAN_AND_MEAN
+#    define WIN32_LEAN_AND_MEAN
+#  endif
+#  include <windows.h>
+#else
+#  include <glob.h>
+#endif
 
 namespace peelo
 {
@@ -38,6 +49,31 @@ namespace peelo
   bool
   glob(const std::string& pattern, std::vector<T>& output)
   {
+#if defined(_WIN32)
+    WIN32_FIND_DATAW find_data;
+    const auto parent = std::filesystem::path(pattern).parent_path();
+    const std::wstring wpattern(std::begin(pattern), std::end(pattern));
+    const auto handle = ::FindFirstFileW(wpattern.c_str(), &find_data);
+
+    if (handle == INVALID_HANDLE_VALUE)
+    {
+      const auto error = ::GetLastError();
+
+      return error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND;
+    }
+    do
+    {
+      if (::wcscmp(find_data.cFileName, L".") != 0
+          && ::wcscmp(find_data.cFileName, L"..") != 0)
+      {
+        output.emplace_back(
+          parent.empty() ? find_data.cFileName : parent / find_data.cFileName
+        );
+      }
+    }
+    while (::FindNextFileW(handle, &find_data) != 0);
+    ::FindClose(handle);
+#else
     ::glob_t result;
     int return_value;
 
@@ -63,6 +99,7 @@ namespace peelo
       output.emplace_back(result.gl_pathv[i]);
     }
     ::globfree(&result);
+#endif
 
     return true;
   }
