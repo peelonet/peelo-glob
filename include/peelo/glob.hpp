@@ -51,6 +51,7 @@ namespace peelo
   {
 #if defined(_WIN32)
     WIN32_FIND_DATAW find_data;
+    const auto parent = std::filesystem::path(pattern).parent_path();
     const std::wstring wpattern(std::begin(pattern), std::end(pattern));
     const auto handle = ::FindFirstFileW(wpattern.c_str(), &find_data);
 
@@ -65,7 +66,9 @@ namespace peelo
       if (::wcscmp(find_data.cFileName, L".") != 0
           && ::wcscmp(find_data.cFileName, L"..") != 0)
       {
-        output.emplace_back(find_data.cFileName);
+        output.emplace_back(
+          parent.empty() ? find_data.cFileName : parent / find_data.cFileName
+        );
       }
     }
     while (::FindNextFileW(handle, &find_data) != 0);
